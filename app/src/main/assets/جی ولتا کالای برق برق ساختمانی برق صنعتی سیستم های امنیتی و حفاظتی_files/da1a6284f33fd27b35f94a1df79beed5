@@ -1,0 +1,12 @@
+(function($){woodmartThemeModule.addToCartAllTypes=function(){if(woodmart_settings.ajax_add_to_cart==!1){return}
+woodmartThemeModule.$body.on('submit','form.cart',function(e){var $form=$(this);var $productWrapper=$form.parents('.single-product-page');if($productWrapper.length===0){$productWrapper=$form.parents('.product-quick-view')}
+if($productWrapper.hasClass('product-type-external')||$productWrapper.hasClass('product-type-zakeke')||$productWrapper.hasClass('product-type-gift-card')||$(e.originalEvent.submitter).hasClass('wd-buy-now-btn')){return}
+e.preventDefault();var $thisbutton=$form.find('.single_add_to_cart_button'),data=$form.serialize();data+='&action=woodmart_ajax_add_to_cart';if($thisbutton.val()){data+='&add-to-cart='+$thisbutton.val()}
+$thisbutton.removeClass('added not-added');$thisbutton.addClass('loading');woodmartThemeModule.$body.trigger('adding_to_cart',[$thisbutton,data]);$.ajax({url:woodmart_settings.ajaxurl,data:data,method:'POST',success:function(response){if(!response){return}
+var this_page=window.location.toString();this_page.replace('add-to-cart','added-to-cart');if(response.error&&response.product_url){window.location=response.product_url;return}
+if(woodmart_settings.cart_redirect_after_add==='yes'){window.location=woodmart_settings.cart_url}else{$thisbutton.removeClass('loading');var fragments=response.fragments;var cart_hash=response.cart_hash;if(fragments){$.each(fragments,function(key){$(key).addClass('updating')})}
+if(fragments){$.each(fragments,function(key,value){$(key).replaceWith(value)})}
+var $noticeWrapper=$('.woocommerce-notices-wrapper');$noticeWrapper.empty();if(response.notices.indexOf('error')>0){$noticeWrapper.append(response.notices);$thisbutton.addClass('not-added')}else{if(woodmart_settings.add_to_cart_action==='widget'){$.magnificPopup.close()}
+$thisbutton.addClass('added');woodmartThemeModule.$body.trigger('added_to_cart',[fragments,cart_hash,$thisbutton])}}},error:function(){console.log('ajax adding to cart error')},complete:function(){}})});woodmartThemeModule.$body.on('click','.wd-sticky-btn .wd-buy-now-btn',function(){if($(this).parents('form.cart').length){return}
+$('form.cart').find('.wd-buy-now-btn').trigger('click')})};$(document).ready(function(){woodmartThemeModule.addToCartAllTypes()})})(jQuery)
+;
